@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build extension artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out extensions
+        uses: actions/checkout@v4
+        with:
+          path: reasonait-extensions
+
+      - name: Check out Reasonait
+        uses: actions/checkout@v4
+        with:
+          repository: jeppejohansen/reasonait
+          path: reasonait
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: reasonait/go.mod
+          cache: true
+          cache-dependency-path: reasonait/go.sum
+
+      - name: Cache Reasonait toolchains
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/reasonait/toolchains
+          key: reasonait-extension-release-toolchains-${{ runner.os }}-${{ runner.arch }}-roc-alpha4-rolling-zig-0.14.1
+
+      - name: Build local Reasonait release bundle
+        working-directory: reasonait
+        run: go run . release bundle "$GITHUB_WORKSPACE/reasonait-dist"
+
+      - name: Test all extensions
+        working-directory: reasonait-extensions
+        env:
+          REASONAIT: ${{ github.workspace }}/reasonait-dist/reasonait-linux-amd64/reasonait
+        run: ./scripts/test-all.sh
+
+      - name: Build extension WASM files
+        working-directory: reasonait-extensions
+        env:
+          OUT_DIR: ${{ github.workspace }}/reasonait-extensions/dist
+          REASONAIT: ${{ github.workspace }}/reasonait-dist/reasonait-linux-amd64/reasonait
+        run: ./scripts/build-all.sh
+
+      - name: Prepare release metadata
+        working-directory: reasonait-extensions
+        run: |
+          cp manifest.toml dist/manifest.toml
+          cd dist
+          sha256sum *.wasm manifest.toml > SHA256SUMS
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            reasonait-extensions/dist/*.wasm
+            reasonait-extensions/dist/manifest.toml
+            reasonait-extensions/dist/SHA256SUMS

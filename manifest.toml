@@ -1,7 +1,8 @@
 name = "reasonait-extensions"
 description = "Standard and example extensions for Reasonait"
-reasonait = ">=0.0.28"
+reasonait = ">=0.0.30"
 extension_abi = "unstable"
+artifact_pattern = "{name}.wasm"
 
 [[extensions]]
 name = "agent-monitor"

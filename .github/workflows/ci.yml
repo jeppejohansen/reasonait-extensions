@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extensions:
+    name: Build and test extensions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out extensions
+        uses: actions/checkout@v4
+        with:
+          path: reasonait-extensions
+
+      - name: Check out Reasonait
+        uses: actions/checkout@v4
+        with:
+          repository: jeppejohansen/reasonait
+          path: reasonait
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: reasonait/go.mod
+          cache: true
+          cache-dependency-path: reasonait/go.sum
+
+      - name: Cache Reasonait toolchains
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/reasonait/toolchains
+          key: reasonait-extension-toolchains-${{ runner.os }}-${{ runner.arch }}-roc-alpha4-rolling-zig-0.14.1
+
+      - name: Build local Reasonait release bundle
+        working-directory: reasonait
+        run: go run . release bundle "$GITHUB_WORKSPACE/reasonait-dist"
+
+      - name: Test all extensions
+        working-directory: reasonait-extensions
+        env:
+          REASONAIT: ${{ github.workspace }}/reasonait-dist/reasonait-linux-amd64/reasonait
+        run: ./scripts/test-all.sh

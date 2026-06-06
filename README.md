@@ -4,21 +4,59 @@ Standard and example extensions for [Reasonait](https://github.com/jeppejohansen
 
 This repository is source-first. Extension authors edit `extension.roc`; Reasonait owns the generated Roc app wrapper, Roc platform, Zig bridge, and WASM ABI glue.
 
+## Structure
+
+Each extension lives in its own directory:
+
+```text
+extensions/<name>/
+|-- extension.roc
+`-- README.md
+```
+
+`extension.roc` is the source artifact authors edit. `README.md` is optional, but recommended for any extension that exposes tools or user-visible behavior.
+
+Release builds produce one WASM module per extension:
+
+```text
+dist/<name>.wasm
+```
+
+That means `extensions/context-bank/extension.roc` becomes `context-bank.wasm`, `extensions/write-guard/extension.roc` becomes `write-guard.wasm`, and so on.
+
 ## Requirements
 
-Best path:
+Best path for users and extension authors:
 
 ```sh
 reasonait version
 ```
 
-A Reasonait release should include the private toolchains needed for extension builds on supported platforms.
+A Reasonait release includes the private toolchains needed for extension builds on supported platforms. Authors should not need to install Roc, Zig, or the Reasonait Roc platform by hand.
 
-Source-checkout fallback:
+Source-checkout fallback for Reasonait development:
 
 ```sh
-REASONAIT="go run /path/to/reasonait" ./scripts/build-all.sh
+cd /path/to/reasonait
+go build -o /tmp/reasonait-current .
+
+cd /path/to/reasonait-extensions
+REASONAIT=/tmp/reasonait-current ./scripts/build-all.sh
 ```
+
+## Using Extensions
+
+End users should install release assets, not build from source. A release contains:
+
+```text
+<extension>.wasm
+manifest.toml
+SHA256SUMS
+```
+
+The intended install shape is that Reasonait downloads a selected `.wasm` asset, verifies it, and registers it under a local alias. Until that installer flow is implemented, the release assets are still the canonical user-facing build output.
+
+Source checkouts are for authoring, reviewing, and local development.
 
 ## Build
 
@@ -32,7 +70,6 @@ Use a custom Reasonait command:
 
 ```sh
 REASONAIT="/path/to/reasonait" ./scripts/build-all.sh
-REASONAIT="go run /path/to/reasonait" ./scripts/build-all.sh
 ```
 
 Build one extension:
@@ -48,6 +85,18 @@ Run Reasonait's extension load/build checks for every extension:
 ```sh
 ./scripts/test-all.sh
 ```
+
+## CI and Releases
+
+CI checks out both this repository and `jeppejohansen/reasonait`, builds a local Reasonait release bundle, and runs `scripts/test-all.sh` through that bundled binary. This keeps the test path aligned with the user-facing binary instead of relying on locally installed Roc or Zig.
+
+Tagged releases build every extension and upload:
+
+- one `<name>.wasm` file per extension
+- `manifest.toml`
+- `SHA256SUMS`
+
+The release workflow intentionally does not commit generated files back to the repository.
 
 ## Repository Policy
 
@@ -66,7 +115,7 @@ extensions/<name>/dist/
 dist/*.wasm
 ```
 
-Release assets should contain prebuilt `.wasm` modules for users who only want to install extensions.
+When adding an extension, add a new `extensions/<name>/` directory and a matching `[[extensions]]` entry in `manifest.toml`.
 
 ## Extensions
 
