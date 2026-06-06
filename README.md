@@ -24,6 +24,31 @@ dist/<name>.wasm
 
 That means `extensions/context-bank/extension.roc` becomes `context-bank.wasm`, `extensions/write-guard/extension.roc` becomes `write-guard.wasm`, and so on.
 
+## Where Is The Roc Platform?
+
+The platform is provided by Reasonait, not by each extension directory.
+
+An `extension.roc` file is author-facing source. It defines `manifest`, `handle_event`, `handle_tool_call`, and `render_ui`, but it does not include the Roc `app ... { platform ... }` header itself.
+
+During `reasonait extension build`, Reasonait wraps that source with a generated Roc app and the embedded Reasonait platform:
+
+```text
+.reasonait/
+|-- main.roc
+`-- platform/
+    |-- main.roc
+    |-- host.zig
+    `-- glue/
+```
+
+By default this generated tree is written to a temporary build directory and removed after the `.wasm` is produced. Use `--materialize-platform` when you want to inspect it:
+
+```sh
+reasonait extension build ./extensions/hello --materialize-platform
+```
+
+The canonical platform files live in the Reasonait repository under `extension/authoring/`. The important pieces are `app_prelude.roc`, `platform/main.roc`, `platform/host.zig`, and `platform/glue/`.
+
 ## Requirements
 
 Best path for users and extension authors:
