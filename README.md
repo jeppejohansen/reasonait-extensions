@@ -90,6 +90,8 @@ Run Reasonait's extension load/build checks for every extension:
 
 CI checks out both this repository and `jeppejohansen/reasonait`, builds a local Reasonait release bundle, and runs `scripts/test-all.sh` through that bundled binary. This keeps the test path aligned with the user-facing binary instead of relying on locally installed Roc or Zig.
 
+Because `jeppejohansen/reasonait` is currently private, hosted CI needs a repository secret named `REASONAIT_REPO_TOKEN` with read-only access to that repository. If Reasonait becomes public, the default GitHub Actions token is enough.
+
 Tagged releases build every extension and upload:
 
 - one `<name>.wasm` file per extension

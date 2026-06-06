@@ -17,12 +17,23 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: reasonait-extensions
+          persist-credentials: false
+
+      - name: Explain private Reasonait access
+        env:
+          REASONAIT_REPO_TOKEN: ${{ secrets.REASONAIT_REPO_TOKEN }}
+        run: |
+          if [ -z "$REASONAIT_REPO_TOKEN" ]; then
+            echo "::notice::REASONAIT_REPO_TOKEN is not set. The Reasonait checkout only works without it if jeppejohansen/reasonait is public."
+          fi
 
       - name: Check out Reasonait
         uses: actions/checkout@v4
         with:
           repository: jeppejohansen/reasonait
           path: reasonait
+          token: ${{ secrets.REASONAIT_REPO_TOKEN || github.token }}
+          persist-credentials: false
 
       - name: Set up Go
         uses: actions/setup-go@v5
