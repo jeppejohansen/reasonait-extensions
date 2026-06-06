@@ -1,0 +1,82 @@
+name = "reasonait-extensions"
+description = "Standard and example extensions for Reasonait"
+reasonait = ">=0.0.28"
+extension_abi = "unstable"
+
+[[extensions]]
+name = "agent-monitor"
+path = "extensions/agent-monitor"
+kind = "standard"
+summary = "Mode panel for live agent-loop state."
+
+[[extensions]]
+name = "compaction"
+path = "extensions/compaction"
+kind = "standard"
+summary = "Explicit conversation compaction tool."
+
+[[extensions]]
+name = "context-bank"
+path = "extensions/context-bank"
+kind = "standard"
+summary = "Context storage and recall support."
+
+[[extensions]]
+name = "critical-assessor"
+path = "extensions/critical-assessor"
+kind = "standard"
+summary = "Nudges the agent toward verification after work phases."
+
+[[extensions]]
+name = "extra-tools"
+path = "extensions/extra-tools"
+kind = "experimental"
+summary = "Experimental helper tools such as glob, web fetch, and evidence storage."
+
+[[extensions]]
+name = "hello"
+path = "extensions/hello"
+kind = "example"
+summary = "Minimal example extension."
+
+[[extensions]]
+name = "output-repair"
+path = "extensions/output-repair"
+kind = "standard"
+summary = "Nudges text-form tool calls back into native tool calls."
+
+[[extensions]]
+name = "quality-monitor"
+path = "extensions/quality-monitor"
+kind = "standard"
+summary = "Observes quality signals across turns."
+
+[[extensions]]
+name = "skill-inject"
+path = "extensions/skill-inject"
+kind = "standard"
+summary = "Injects concise tool-use guidance."
+
+[[extensions]]
+name = "small-model-harness"
+path = "extensions/small-model-harness"
+kind = "experimental"
+summary = "Stricter workflow guidance for small local models."
+
+[[extensions]]
+name = "smart-compaction"
+path = "extensions/smart-compaction"
+kind = "standard"
+summary = "Compaction guidance for context pressure."
+
+[[extensions]]
+name = "thinking-budget"
+path = "extensions/thinking-budget"
+kind = "standard"
+summary = "Model-parameter and prompting guidance for thinking budget."
+
+[[extensions]]
+name = "write-guard"
+path = "extensions/write-guard"
+kind = "standard"
+summary = "Guarded write tool that prefers edits for existing files."

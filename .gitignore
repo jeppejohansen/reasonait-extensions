@@ -1,0 +1,8 @@
+# Reasonait-generated build artifacts
+.reasonait/
+dist/
+*.wasm
+
+# Local tool and test output
+coverage.out
+.DS_Store
